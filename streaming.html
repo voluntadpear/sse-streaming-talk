@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, height=device-height" />
+    <title>Demo de Streaming</title>
+    <style type="text/css">
+      body {
+        font-family: "Open Sans", sans-serif;
+      }
+
+      .user {
+        color: rgb(13, 13, 76);
+      }
+
+      .assistant {
+        color: rgb(163, 113, 21);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>HTTP Streaming</h1>
+    <form id="question-form">
+      <label>
+        Pregunta para Chat-GPT:
+        <input type="text" name="question" />
+      </label>
+      <label>¿Usar streaming? <input type="checkbox" name="streaming" /></label>
+      <button>Enviar</button>
+    </form>
+    <h2>Conversación:</h2>
+    <ul></ul>
+
+    <script type="module">
+      import { processStreaming, processJSON, li } from "./lib.js";
+
+      document
+        .getElementById("question-form")
+        .addEventListener("submit", async function listener(event) {
+          event.preventDefault();
+
+          const formData = new FormData(event.target);
+          const question = formData.get("question");
+          const streaming = formData.get("streaming") === "on" ? true : false;
+
+          if (!question) {
+            return;
+          }
+
+          event.target.reset();
+          li(`Usuario: ${question}`, { className: "user" });
+          const start = performance.now();
+
+          const response = await fetch(
+            "https://api.openai.com/v1/chat/completions",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                model: "gpt-3.5-turbo",
+                messages: [{ role: "user", content: question }],
+                stream: streaming,
+              }),
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer <YOUR_OPENAI_KEY>",
+              },
+            }
+          );
+
+          if (streaming) {
+            processStreaming(response, start);
+          } else {
+            processJSON(response, start);
+          }
+        });
+    </script>
+  </body>
+</html>

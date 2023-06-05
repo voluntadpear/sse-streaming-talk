@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, height=device-height" />
+    <title>Demo de Server-Sent Events</title>
+    <style type="text/css">
+      body {
+        font-family: "Open Sans", sans-serif;
+      }
+
+      .italic {
+        font-style: italic;
+      }
+
+      .error {
+        color: rgb(148, 19, 19);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Demo de Server-Sent Events</h1>
+    <p>Notificaciones recibidas:</p>
+    <ul></ul>
+
+    <script type="module">
+      function start() {
+        const es = new EventSource("/notifications");
+
+        es.addEventListener("open", function () {
+          li("Servidor conectado", { className: "italic" });
+        });
+        es.addEventListener("message", function (event) {
+          li(event.data);
+        });
+        es.addEventListener("error", function () {
+          li("Error en la conexión ⚠️", { className: "error" });
+        });
+
+        const ul = document.querySelector("ul");
+        function li(text, options = {}) {
+          const li = document.createElement("li");
+          li.innerText = text;
+          if (options.className) {
+            li.classList.add(options.className);
+          }
+          ul.appendChild(li);
+        }
+      }
+
+      start();
+    </script>
+  </body>
+</html>
