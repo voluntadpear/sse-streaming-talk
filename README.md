@@ -1,5 +1,7 @@
 # Demo of Server-Sent Events and HTTP Streaming
 
+Part of a talk I gave on Server-sent events and HTTP streaming.
+
 ## Getting started
 
 1. Run `npm install`
